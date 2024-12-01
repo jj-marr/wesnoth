@@ -146,7 +146,7 @@ namespace
 	void warn_unknown_attribute(const config::const_attr_itors& cfg)
 	{
 		config::const_attribute_iterator cur = cfg.begin();
-		config::const_attribute_iterator end = cfg.end();
+		const config::const_attribute_iterator end = cfg.end();
 
 		auto cur_known = internalized_attrs.begin();
 		auto end_known = internalized_attrs.end();
@@ -155,7 +155,7 @@ namespace
 			if(cur == end) {
 				return;
 			}
-			int comp = cur->first.compare(*cur_known);
+			const int comp = cur->first.compare(*cur_known);
 			if(comp < 0) {
 				WRN_UT << "Unknown attribute '" << cur->first << "' discarded.";
 				++cur;
@@ -177,12 +177,12 @@ namespace
 
 	auto stats_storage_resetter(unit& u, bool clamp = false)
 	{
-		int hitpoints = u.hitpoints();
-		int moves = u.movement_left();
-		int attacks = u.attacks_left(true);
-		int experience= u.experience();
-		bool slowed= u.get_state(unit::STATE_SLOWED);
-		bool poisoned= u.get_state(unit::STATE_POISONED);
+		const int hitpoints = u.hitpoints();
+		const int moves = u.movement_left();
+		const int attacks = u.attacks_left(true);
+		const int experience = u.experience();
+		const bool slowed = u.get_state(unit::STATE_SLOWED);
+		const bool poisoned = u.get_state(unit::STATE_POISONED);
 		return [=, &u] () {
 			if(clamp) {
 				u.set_movement(std::min(u.total_movement(), moves));
@@ -611,11 +611,15 @@ void unit::init(const config& cfg, bool use_traits, const vconfig* vcfg)
 				stage = ca["stage"].str();
 				ca.remove_attribute("stage");
 			}
-			config mod{
-				"action", "add",
-				"side", side(),
-				"path", "stage[" + stage + "].candidate_action[]",
-				"candidate_action", ca,
+			const config mod{
+				"action",
+				"add",
+				"side",
+				side(),
+				"path",
+				"stage[" + stage + "].candidate_action[]",
+				"candidate_action",
+				ca,
 			};
 			ai_events.add_child("modify_ai", mod);
 		}
@@ -625,7 +629,7 @@ void unit::init(const config& cfg, bool use_traits, const vconfig* vcfg)
 	}
 
 	// Don't use the unit_type's attacks if this config has its own defined
-	if(config::const_child_itors cfg_range = cfg.child_range("attack")) {
+	if(const config::const_child_itors cfg_range = cfg.child_range("attack")) {
 		set_attr_changed(UA_ATTACKS);
 		attacks_.clear();
 		for(const config& c : cfg_range) {
@@ -634,7 +638,7 @@ void unit::init(const config& cfg, bool use_traits, const vconfig* vcfg)
 	}
 
 	// Don't use the unit_type's special notes if this config has its own defined
-	if(config::const_child_itors cfg_range = cfg.child_range("special_note")) {
+	if(const config::const_child_itors cfg_range = cfg.child_range("special_note")) {
 		set_attr_changed(UA_NOTES);
 		special_notes_.clear();
 		for(const config& c : cfg_range) {
@@ -653,7 +657,7 @@ void unit::init(const config& cfg, bool use_traits, const vconfig* vcfg)
 
 	// Don't use the unit_type's abilities if this config has its own defined
 	// Why do we allow multiple [abilities] tags?
-	if(config::const_child_itors cfg_range = cfg.child_range("abilities")) {
+	if(const config::const_child_itors cfg_range = cfg.child_range("abilities")) {
 		set_attr_changed(UA_ABILITIES);
 		abilities_.clear();
 		for(const config& abilities : cfg_range) {
@@ -839,7 +843,7 @@ void unit::generate_traits(bool must_have_only)
 	// Now randomly fill out to the number of traits required or until
 	// there aren't any more traits.
 	int nb_traits = current_traits.size();
-	int max_traits = u_type.num_traits();
+	const int max_traits = u_type.num_traits();
 	for(; nb_traits < max_traits; ++nb_traits)
 	{
 		current_traits = modifications_.child_range("trait");
@@ -922,7 +926,7 @@ void unit::generate_traits(bool must_have_only)
 			break;
 		}
 
-		int num = randomness::generator->get_random_int(0,candidate_traits.size()-1);
+		const int num = randomness::generator->get_random_int(0, candidate_traits.size() - 1);
 		modifications_.add_child("trait", *candidate_traits[num]);
 		candidate_traits.erase(candidate_traits.begin() + num);
 	}
@@ -1103,8 +1107,8 @@ void unit::advance_to(const unit_type& u_type, bool use_traits)
 		}
 		resources::game_events->add_events(events.child_range("event"), *resources::lua_kernel, new_type.id());
 	}
-	bool bool_small_profile = get_attr_changed(UA_SMALL_PROFILE);
-	bool bool_profile = get_attr_changed(UA_PROFILE);
+	const bool bool_small_profile = get_attr_changed(UA_SMALL_PROFILE);
+	const bool bool_profile = get_attr_changed(UA_PROFILE);
 	clear_changed_attributes();
 	if(bool_small_profile && small_profile_ != new_type.small_profile()) {
 		set_attr_changed(UA_SMALL_PROFILE);
@@ -1352,7 +1356,7 @@ void unit::new_scenario()
 
 void unit::heal(int amount)
 {
-	int max_hp = max_hitpoints();
+	const int max_hp = max_hitpoints();
 	if(hit_points_ < max_hp) {
 		hit_points_ += amount;
 
@@ -1385,7 +1389,7 @@ const std::set<std::string> unit::get_states() const
 
 bool unit::get_state(const std::string& state) const
 {
-	state_t known_boolean_state_id = get_known_boolean_state_id(state);
+	const state_t known_boolean_state_id = get_known_boolean_state_id(state);
 	if(known_boolean_state_id!=STATE_UNKNOWN){
 		return get_state(known_boolean_state_id);
 	}
@@ -1445,7 +1449,7 @@ std::map<std::string, unit::state_t> unit::known_boolean_state_names_ {
 void unit::set_state(const std::string& state, bool value)
 {
 	appearance_changed_ = true;
-	state_t known_boolean_state_id = get_known_boolean_state_id(state);
+	const state_t known_boolean_state_id = get_known_boolean_state_id(state);
 	if(known_boolean_state_id != STATE_UNKNOWN) {
 		set_state(known_boolean_state_id, value);
 		return;
@@ -1656,7 +1660,7 @@ void unit::write(config& cfg, bool write_all) const
 
 	if(write_all || get_attr_changed(UA_ATTACKS) || get_attacks_changed()) {
 		cfg.clear_children("attack");
-		for(attack_ptr i : attacks_) {
+		for(const attack_ptr i : attacks_) {
 			i->write(cfg.add_child("attack"));
 		}
 	}
@@ -1715,7 +1719,7 @@ void unit::set_loyal(bool loyal)
 
 int unit::defense_modifier(const t_translation::terrain_code & terrain) const
 {
-	int def = movement_type_.defense_modifier(terrain);
+	const int def = movement_type_.defense_modifier(terrain);
 #if 0
 	// A [defense] ability is too costly and doesn't take into account target locations.
 	// Left as a comment in case someone ever wonders why it isn't a good idea.
@@ -1760,7 +1764,7 @@ int unit::resistance_value(unit_ability_list resistance_list, const std::string&
 	});
 
 	if(!resistance_list.empty()) {
-		unit_abilities::effect resist_effect(resistance_list, 100-res);
+		const unit_abilities::effect resist_effect(resistance_list, 100 - res);
 
 		res = 100 - resist_effect.get_composite_value();
 	}
@@ -1784,12 +1788,13 @@ int unit::resistance_against(const std::string& damage_name, bool attacker, cons
 		return !resistance_filter_matches_base(*i.ability_cfg, attacker);
 	});
 	if(opp_weapon){
-		unit_ability_list damage_type_list = opp_weapon->get_specials_and_abilities("damage_type");
+		const unit_ability_list damage_type_list = opp_weapon->get_specials_and_abilities("damage_type");
 		if(damage_type_list.empty()){
 			return resistance_value(resistance_list, damage_name);
 		}
-		std::string replacement_type = opp_weapon->select_damage_type(damage_type_list, "replacement_type", resistance_list);
-		std::string type_damage = replacement_type.empty() ? damage_name : replacement_type;
+		const std::string replacement_type
+			= opp_weapon->select_damage_type(damage_type_list, "replacement_type", resistance_list);
+		const std::string type_damage = replacement_type.empty() ? damage_name : replacement_type;
 		int max_res = resistance_value(resistance_list, type_damage);
 		for(auto& i : damage_type_list) {
 			if((*i.ability_cfg).has_attribute("alternative_type")){
@@ -1893,8 +1898,8 @@ std::vector<config> unit::get_modification_advances() const
 
 		bool exclusion_found = false;
 		for(const std::string& s : uniq_exclude) {
-			int max_num = std::count(temp_exclude.begin(), temp_exclude.end(), s);
-			int mod_num = modification_count("advancement", s);
+			const int max_num = std::count(temp_exclude.begin(), temp_exclude.end(), s);
+			const int mod_num = modification_count("advancement", s);
 			if(mod_num >= max_num) {
 				exclusion_found = true;
 				break;
@@ -1907,8 +1912,8 @@ std::vector<config> unit::get_modification_advances() const
 
 		bool requirements_done = true;
 		for(const std::string& s : uniq_require) {
-			int required_num = std::count(temp_require.begin(), temp_require.end(), s);
-			int mod_num = modification_count("advancement", s);
+			const int required_num = std::count(temp_require.begin(), temp_require.end(), s);
+			const int mod_num = modification_count("advancement", s);
 			if(required_num > mod_num) {
 				requirements_done = false;
 				break;
@@ -1973,8 +1978,8 @@ std::string unit::describe_builtin_effect(std::string apply_to, const config& ef
 		std::vector<t_string> attack_names;
 
 		std::string desc;
-		for(attack_ptr a : attacks_) {
-			bool affected = a->describe_modification(effect, &desc);
+		for(const attack_ptr a : attacks_) {
+			const bool affected = a->describe_modification(effect, &desc);
 			if(affected && !desc.empty()) {
 				attack_names.emplace_back(a->name(), "wesnoth-units");
 			}
@@ -2055,7 +2060,7 @@ void unit::apply_builtin_effect(std::string apply_to, const config& effect)
 			description_ = *v;
 		}
 
-		if(config::const_child_itors cfg_range = effect.child_range("special_note")) {
+		if(const config::const_child_itors cfg_range = effect.child_range("special_note")) {
 			for(const config& c : cfg_range) {
 				if(!c["remove"].to_bool()) {
 					special_notes_.emplace_back(c["note"].t_str());
@@ -2082,7 +2087,7 @@ void unit::apply_builtin_effect(std::string apply_to, const config& effect)
 		utils::erase_if(attacks_, [&effect](attack_ptr a) { return a->matches_filter(effect); });
 	} else if(apply_to == "attack") {
 		set_attr_changed(UA_ATTACKS);
-		for(attack_ptr a : attacks_) {
+		for(const attack_ptr a : attacks_) {
 			a->apply_modification(effect);
 			for(const config& specials : effect.child_range("set_specials")) {
 				for(const auto [key, special] : specials.all_children_view()) {
@@ -2438,7 +2443,7 @@ void unit::apply_builtin_effect(std::string apply_to, const config& effect)
 
 void unit::add_modification(const std::string& mod_type, const config& mod, bool no_add)
 {
-	bool generate_description = mod["generate_description"].to_bool(true);
+	const bool generate_description = mod["generate_description"].to_bool(true);
 
 	config* target = nullptr;
 
@@ -2689,7 +2694,7 @@ unit& unit::mark_clone(bool is_temporary)
 		else {
 			underlying_id_ = ids.next_fake_id();
 		}
-		std::string::size_type pos = id_.find_last_of('-');
+		const std::string::size_type pos = id_.find_last_of('-');
 		if(pos != std::string::npos && pos+1 < id_.size()
 		&& id_.find_first_not_of("0123456789", pos+1) == std::string::npos) {
 			// this appears to be a duplicate of a generic unit, so give it a new id
