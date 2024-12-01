@@ -299,7 +299,7 @@ void side_actions::get_numbers(const map_location& hex, numbers_t& result)
 					main_number = index;
 				}
 
-				for(const weak_action_ptr action : hlighter->get_secondary_highlights()) {
+				for(const weak_action_ptr& action : hlighter->get_secondary_highlights()) {
 					if(action.lock() == *it) {
 						secondary_numbers.insert(index);
 					}
@@ -391,7 +391,7 @@ void side_actions::hide()
 
 	hidden_ = true;
 
-	for(const action_ptr act : *this) {
+	for(const action_ptr& act : *this) {
 		act->hide();
 	}
 }
@@ -403,7 +403,7 @@ void side_actions::show()
 
 	hidden_ = false;
 
-	for(const action_ptr act : *this) {
+	for(const action_ptr& act : *this) {
 		act->show();
 	}
 }
