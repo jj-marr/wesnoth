@@ -1,0 +1,39 @@
+name: clang-tidy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clang-tidy-review:
+    runs-on: ubuntu-latest
+    container:
+      image: wesnoth/wesnoth:2404-master
+      options: --tty # docker create options
+      env:
+        TOOL: ${{ matrix.tool }}
+        CFG: ${{ matrix.cfg }}
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
+        CXX_STD: ${{ matrix.std }}
+        LTO: ${{ matrix.lto }}
+        SYS_LUA: ${{ matrix.sys_lua }}
+        CLICOLOR_FORCE: 1
+        SDL_VIDEODRIVER: dummy
+    steps:
+    - { uses: actions/checkout@v4, with: { submodules: "recursive" } }
+    - name: Install reviewdog
+      uses: reviewdog/action-setup@v1
+
+    - name: Build compilation database
+      run: scons cdb
+    
+    - name: Run clang-tidy
+        # disable all warnings since we have coverage on them in a standard build, and clang-tidy
+        # triggers false positive compiler warnings that clang itself won't
+      run: |
+        run-clang-tidy -use-color -j 2 -extra-arg="-w" '^(?!.*src/modules/|.*build/)' | \
+        reviewdog \
+          -f=clang-tidy \
+          -reporter=github-pr-review \
+          -fail-on-error=false \
+          -level=warning
