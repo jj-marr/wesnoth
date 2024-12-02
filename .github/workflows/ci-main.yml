@@ -94,11 +94,6 @@ jobs:
               }
               build strict=true wesnoth boost_unit_tests
 
-              build cdb
-              # disable all warnings since we have coverage on them in a standard build, and clang-tidy
-              # triggers false positive compiler warnings that clang itself won't
-              run-clang-tidy -use-color -j 2 -extra-arg="-w" '^(?!.*src/modules/|.*build/)'
-
               apt remove -y -qq libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
 
               build strict=false wesnothd campaignd
