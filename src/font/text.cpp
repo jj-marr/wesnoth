@@ -828,7 +828,7 @@ PangoRectangle pango_text::calculate_size(PangoLayout& layout) const
  */
 struct inverse_table
 {
-	unsigned values[256] {};
+	std::array<unsigned, 256> values {};
 
 	constexpr inverse_table()
 	{
