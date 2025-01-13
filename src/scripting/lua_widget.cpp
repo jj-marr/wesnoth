@@ -26,10 +26,9 @@
 #include "scripting/lua_ptr.hpp"
 #include "scripting/push_check.hpp"
 
+#include <string_view>
 
-
-
-static const char widgetKey[] = "widget";
+static constexpr std::string_view widgetKey = "widget";
 static char widgetdataKey[] = "widgetdata";
 
 void luaW_pushwidget(lua_State* L, gui2::widget& w)

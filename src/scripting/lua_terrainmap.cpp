@@ -23,14 +23,15 @@
 #include "game_board.hpp"
 #include "play_controller.hpp"
 
+#include <string_view>
 
 static lg::log_domain log_scripting_lua("scripting/lua");
 #define LOG_LUA LOG_STREAM(info, log_scripting_lua)
 #define ERR_LUA LOG_STREAM(err, log_scripting_lua)
 
-static const char terrainmapKey[] = "terrain map";
-static const char maplocationKey[] = "special locations";
-static const char mapReplaceIfFailedKey[] = "replace_if_failed terrain code";
+static constexpr std::string_view terrainmapKey = "terrain map";
+static constexpr std::string_view maplocationKey = "special locations";
+static constexpr std::string_view mapReplaceIfFailedKey = "replace_if_failed terrain code";
 
 namespace replace_if_failed_idx {
 	enum {CODE = 1, MODE = 2};

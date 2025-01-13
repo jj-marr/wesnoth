@@ -720,7 +720,7 @@ void luaW_push_namedtuple(lua_State* L, const std::vector<std::string>& names)
 		{ nullptr, nullptr }
 	};
 	luaL_setfuncs(L, callbacks, 0);
-	static const char baseName[] = "named tuple";
+	static constexpr std::string_view baseName = "named tuple";
 	std::ostringstream str;
 	str << baseName << '(';
 	if(!names.empty()) {

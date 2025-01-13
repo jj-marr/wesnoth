@@ -19,11 +19,13 @@
 #include "log.hpp"
 #include "game_config.hpp"
 
+#include <string_view>
+
 static lg::log_domain log_scripting_lua("scripting/lua");
 #define LOG_LUA LOG_STREAM(info, log_scripting_lua)
 #define ERR_LUA LOG_STREAM(err, log_scripting_lua)
 
-static const char colorKey[] = "color range";
+static constexpr std::string_view colorKey = "color range";
 
 static bool luaW_iscolor(lua_State* L, int index)
 {
